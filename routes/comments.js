@@ -9,7 +9,7 @@ router.get("/comments/:postId", async (req, res) => {
   const comment = await Comment.find({ postId });
   if (!comment.length) {
     return res
-      .status(400)
+      .status(404)
       .json({ success: false, msg: "해당 게시글에 댓글이 없습니다." });
   }
   const sortedList = comment
@@ -23,42 +23,40 @@ router.get("/comments/:postId", async (req, res) => {
 //댓글 생성
 router.post("/comment", async (req, res) => {
   const { postId, content, commentId } = req.body;
-  //댓글 내용 입력했는지
   if (!content.length) {
     return res
-      .status(400)
+      .status(404)
       .json({ success: false, msg: "댓글 내용을 입력해주세요" });
   }
   //게시글 아이디가 존재하는지
   const postIdFind = await Post.find({ postId });
-  if (!postIdFind.length)
+  if (!postIdFind.length) {
     return res
-      .status(400)
-      .json({ success: false, msg: "해당 게시글이 존재하지 않습니다" });
+      .status(404)
+      .json({ success: false, msg: "해당 게시글이 존재하지 않습니다." });
+  }
   //댓글 아이디 중복
   const commentIdFind = await Comment.find({ commentId });
-  if (commentIdFind.length)
+  if (commentIdFind.length) {
     return res
-      .status(400)
-      .json({ success: false, msg: "해당 댓글아이디는 이미 존재합니다" });
-
+      .status(404)
+      .json({ success: false, msg: "해당 댓글아이디는 이미 존재합니다." });
+  }
   await Comment.create({
     postId,
     content,
     commentId,
   });
-
   res.status(200).json({ success: true, msg: "댓글이 등록되었습니다." });
 });
 
 //댓글 수정
 router.put("/comment/update", async (req, res) => {
   const { postId, content, commentId } = req.body;
-  //댓글 내용 입력했는지
   if (!content.length) {
     return res
-      .status(400)
-      .json({ success: false, msg: "댓글 내용을 입력해주세요" });
+      .status(404)
+      .json({ success: false, msg: "댓글 내용을 입력해주세요." });
   }
   const comment = await Comment.findOneAndUpdate(
     { commentId, postId },
@@ -66,9 +64,9 @@ router.put("/comment/update", async (req, res) => {
     { new: true }
   );
   if (!comment) {
-    return res.status(400).json({
+    return res.status(404).json({
       success: false,
-      msg: "게시글id 혹은 댓글id가 일치하지 않습니다",
+      msg: "게시글id 혹은 댓글id가 일치하지 않습니다.",
     });
   }
   res
