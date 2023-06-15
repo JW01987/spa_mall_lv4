@@ -3,7 +3,7 @@ const router = express.Router();
 const Post = require("../schemas/post");
 
 //전체 게시글 조회
-router.get("/postlist", async (req, res) => {
+router.get("/posts", async (req, res) => {
   const posts = await Post.find({});
   if (!posts.length) {
     return res
@@ -59,9 +59,10 @@ router.put("/post/update", async (req, res) => {
     { new: true }
   );
   if (!post) {
-    return res
-      .status(404)
-      .json({ success: false, msg: "해당 게시글이 없습니다." });
+    return res.status(404).json({
+      success: false,
+      msg: "해당 게시글이 없거나 비밀번호가 잘못되었습니다.",
+    });
   }
   res.status(200).json({ success: true, msg: "게시글이 수정되었습니다" });
 });
@@ -73,7 +74,10 @@ router.delete("/post/delete/:postId/:password", async (req, res) => {
   if (!post) {
     return res
       .status(404)
-      .json({ success: false, msg: "해당 게시글이 없습니다." });
+      .json({
+        success: false,
+        msg: "해당 게시글이 없습거나 비밀번호가 잘못되었습니다.",
+      });
   }
   res.status(200).json({ success: true, msg: "게시글이 삭제되었습니다" });
 });
