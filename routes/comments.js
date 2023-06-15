@@ -29,14 +29,14 @@ router.post("/comment", async (req, res) => {
       .json({ success: false, msg: "댓글 내용을 입력해주세요" });
   }
   //게시글 아이디가 존재하는지
-  const postIdFind = await Post.find({ postId });
+  const postIdFind = await Post.find({ postId }, { password: 0 });
   if (!postIdFind.length) {
     return res
       .status(404)
       .json({ success: false, msg: "해당 게시글이 존재하지 않습니다." });
   }
   //댓글 아이디 중복
-  const commentIdFind = await Comment.find({ commentId });
+  const commentIdFind = await Comment.find({ commentId }, { password: 0 });
   if (commentIdFind.length) {
     return res
       .status(404)
@@ -69,9 +69,7 @@ router.put("/comment/update", async (req, res) => {
       msg: "게시글id 혹은 댓글id가 일치하지 않습니다.",
     });
   }
-  res
-    .status(200)
-    .json({ success: true, msg: "댓글이 수정되었습니다.", comment });
+  res.status(200).json({ success: true, msg: "댓글이 수정되었습니다." });
 });
 
 //댓글 삭제
@@ -83,8 +81,6 @@ router.delete("/comment/delete/:commentId", async (req, res) => {
       .status(404)
       .json({ success: false, msg: "해당 댓글이 없습니다." });
   }
-  res
-    .status(200)
-    .json({ success: true, msg: "댓글이 삭제되었습니다.", comment });
+  res.status(200).json({ success: true, msg: "댓글이 삭제되었습니다." });
 });
 module.exports = router;

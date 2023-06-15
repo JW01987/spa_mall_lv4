@@ -4,7 +4,7 @@ const Post = require("../schemas/post");
 
 //전체 게시글 조회
 router.get("/posts", async (req, res) => {
-  const post = await Post.find({});
+  const post = await Post.find({}, { password: 0 });
   if (!post.length) {
     return res
       .status(404)
@@ -21,7 +21,7 @@ router.get("/posts", async (req, res) => {
 router.get("/posts/search", async (req, res) => {
   const { searchWord, searchData } = req.query;
   //키 값으로 변수를 넣고싶을때는 []로 감싸준다
-  const post = await Post.find({ [searchWord]: searchData });
+  const post = await Post.find({ [searchWord]: searchData }, { password: 0 });
   console.log(post);
   if (post) {
     return res
@@ -40,7 +40,7 @@ router.post("/post", async (req, res) => {
       .status(404)
       .json({ success: false, msg: "내용을 추가해 주세요." });
   }
-  const post = await Post.find({ postId });
+  const post = await Post.find({ postId }, { password: 0 });
   if (post.length) {
     return res
       .status(404)
