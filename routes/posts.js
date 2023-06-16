@@ -22,8 +22,7 @@ router.get("/posts/search", async (req, res) => {
   const { searchWord, searchData } = req.query;
   //키 값으로 변수를 넣고싶을때는 []로 감싸준다
   const post = await Post.find({ [searchWord]: searchData }, { password: 0 });
-  console.log(post);
-  if (post) {
+  if (!post) {
     return res
       .status(404)
       .json({ success: false, msg: "데이터를 불러올 수 없습니다." });
@@ -60,6 +59,11 @@ router.post("/post", async (req, res) => {
 //게시글 수정
 router.put("/post/update", async (req, res) => {
   const { postId, title, writer, content, password } = req.body;
+  if (!content) {
+    return res
+      .status(404)
+      .json({ success: false, msg: "내용을 추가해 주세요." });
+  }
   const post = await Post.findOneAndUpdate(
     { postId, password },
     { title, writer, content },
