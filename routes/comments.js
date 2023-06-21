@@ -21,8 +21,8 @@ router.get("/comments/:postId", async (req, res) => {
 });
 
 //댓글 생성
-router.post("/comment", async (req, res) => {
-  const { postId, content, commentId } = req.body;
+router.post("/comments", async (req, res) => {
+  const { postId, content } = req.body;
   if (!content.length) {
     return res
       .status(404)
@@ -35,14 +35,10 @@ router.post("/comment", async (req, res) => {
       .status(404)
       .json({ success: false, msg: "해당 게시글이 존재하지 않습니다." });
   }
-  //댓글 아이디 중복
-  const commentIdFind = await Comment.find({ commentId }, { password: 0 });
-  if (commentIdFind.length) {
-    return res
-      .status(404)
-      .json({ success: false, msg: "해당 댓글아이디는 이미 존재합니다." });
-  }
-  await Comment.create({
+
+  const maxOrderByCommentId = await Comment.findOne().sort("-commentId").exec();
+  const commentId = maxOrderByCommentId ? maxOrderByCommentId.postId + 1 : 1;
+  Comment.create({
     postId,
     content,
     commentId,
@@ -51,7 +47,7 @@ router.post("/comment", async (req, res) => {
 });
 
 //댓글 수정
-router.put("/comment/update", async (req, res) => {
+router.put("/comments", async (req, res) => {
   const { postId, content, commentId } = req.body;
   if (!content.length) {
     return res
@@ -73,8 +69,8 @@ router.put("/comment/update", async (req, res) => {
 });
 
 //댓글 삭제
-router.delete("/comment/delete/:commentId", async (req, res) => {
-  const { commentId } = req.params;
+router.delete("/comments", async (req, res) => {
+  const { commentId } = req.body;
   const comment = await Comment.findOneAndDelete({ commentId });
   if (!comment) {
     return res

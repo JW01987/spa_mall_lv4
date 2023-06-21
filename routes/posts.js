@@ -18,7 +18,7 @@ router.get("/posts", async (req, res) => {
 });
 
 //게시글 검색 조회
-router.get("/posts/search", async (req, res) => {
+router.get("/posts", async (req, res) => {
   const { searchWord, searchData } = req.query;
   //키 값으로 변수를 넣고싶을때는 []로 감싸준다
   const post = await Post.find({ [searchWord]: searchData }, { password: 0 });
@@ -32,32 +32,30 @@ router.get("/posts/search", async (req, res) => {
 });
 
 //게시글 생성
-router.post("/post", async (req, res) => {
-  const { postId, title, writer, content, password } = req.body;
-  if (!content) {
+router.post("/posts", async (req, res) => {
+  const { title, writer, content, password } = req.body;
+  if (!content || !title || !writer || !password) {
     return res
       .status(404)
       .json({ success: false, msg: "내용을 추가해 주세요." });
   }
-  const post = await Post.find({ postId }, { password: 0 });
-  if (post.length) {
-    return res
-      .status(404)
-      .json({ success: false, msg: "이미 있는 데이터입니다." });
-  }
+
+  const maxOrderByPostId = await Post.findOne().sort("-postId").exec();
+  const newPostId = maxOrderByPostId ? maxOrderByPostId.postId + 1 : 1;
+
   Post.create({
     title,
     writer,
     content,
     password,
-    postId,
+    newPostId,
   });
 
   res.status(200).json({ success: true, msg: "게시글이 저장되었습니다." });
 });
 
 //게시글 수정
-router.put("/post/update", async (req, res) => {
+router.put("/post", async (req, res) => {
   const { postId, title, writer, content, password } = req.body;
   if (!content) {
     return res
@@ -79,8 +77,8 @@ router.put("/post/update", async (req, res) => {
 });
 
 //게시글 삭제
-router.delete("/post/delete/:postId/:password", async (req, res) => {
-  const { postId, password } = req.params;
+router.delete("/post", async (req, res) => {
+  const { postId, password } = req.body;
   const post = await Post.findOneAndDelete({ postId, password });
   if (!post) {
     return res.status(404).json({
