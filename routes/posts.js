@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../schemas/post");
+const authMiddleware = require("../middlewares/auth-middleware");
 
 //전체 게시글 조회
 router.get("/posts", async (req, res) => {
-  const post = await Post.find({}, { password: 0 });
+  const post = await Post.find({}, { content: 0 });
   if (!post.length) {
     return res
       .status(404)
@@ -17,11 +18,10 @@ router.get("/posts", async (req, res) => {
   res.status(200).json({ success: true, sortedList });
 });
 
-//게시글 검색 조회
-router.get("/posts", async (req, res) => {
-  const { searchWord, searchData } = req.query;
-  //키 값으로 변수를 넣고싶을때는 []로 감싸준다
-  const post = await Post.find({ [searchWord]: searchData }, { password: 0 });
+//게시글 상세 조회
+router.get("/posts/:postId", async (req, res) => {
+  const { postId } = req.params;
+  const post = await Post.find({ postId });
   if (!post) {
     return res
       .status(404)
@@ -32,9 +32,10 @@ router.get("/posts", async (req, res) => {
 });
 
 //게시글 생성
-router.post("/posts", async (req, res) => {
-  const { title, writer, content, password } = req.body;
-  if (!content || !title || !writer || !password) {
+router.post("/posts", authMiddleware, async (req, res) => {
+  const { title, content } = req.body;
+  const { nickname } = res.locals.user;
+  if (!content || !title) {
     return res
       .status(404)
       .json({ success: false, msg: "내용을 추가해 주세요." });
@@ -45,47 +46,48 @@ router.post("/posts", async (req, res) => {
 
   Post.create({
     title,
-    writer,
+    nickname,
     content,
-    password,
-    newPostId,
+    postId: newPostId,
   });
 
   res.status(200).json({ success: true, msg: "게시글이 저장되었습니다." });
 });
 
 //게시글 수정
-router.put("/post", async (req, res) => {
-  const { postId, title, writer, content, password } = req.body;
-  if (!content) {
+router.put("/post", authMiddleware, async (req, res) => {
+  const { postId, title, content } = req.body;
+  const { nickname } = res.locals.user;
+  if (!content || !title) {
     return res
       .status(404)
-      .json({ success: false, msg: "내용을 추가해 주세요." });
+      .json({ success: false, msg: "내용이나 제목을 추가해 주세요." });
   }
-  const post = await Post.findOneAndUpdate(
-    { postId, password },
-    { title, writer, content },
+  const checkPostId = await Post.findOne({ postId });
+  if (checkPostId.nickname !== nickname) {
+    return res
+      .status(404)
+      .json({ success: false, msg: "작성자만 수정 할 수 있습니다." });
+  }
+  await Post.findOneAndUpdate(
+    { postId, nickname },
+    { title, content },
     { new: true }
   );
-  if (!post) {
-    return res.status(404).json({
-      success: false,
-      msg: "해당 게시글이 없거나 비밀번호가 잘못되었습니다.",
-    });
-  }
   res.status(200).json({ success: true, msg: "게시글이 수정되었습니다." });
 });
 
 //게시글 삭제
-router.delete("/post", async (req, res) => {
-  const { postId, password } = req.body;
-  const post = await Post.findOneAndDelete({ postId, password });
-  if (!post) {
-    return res.status(404).json({
-      success: false,
-      msg: "해당 게시글이 없거나 비밀번호가 잘못되었습니다.",
-    });
+router.delete("/post", authMiddleware, async (req, res) => {
+  const { postId } = req.params;
+  const { nickname } = res.locals.user;
+  const checkPostId = await Post.findOne({ postId });
+  if (checkPostId.nickname !== nickname) {
+    return res
+      .status(404)
+      .json({ success: false, msg: "작성자만 삭제 할 수 있습니다." });
   }
+  await Post.findOneAndDelete({ postId, nickname });
   res.status(200).json({ success: true, msg: "게시글이 삭제되었습니다." });
 });
 

@@ -1,6 +1,7 @@
 const Comment = require("../schemas/comment");
 const Post = require("../schemas/post");
 const express = require("express");
+const authMiddleware = require("../middlewares/auth-middleware");
 const router = express.Router();
 
 //게시글에 해당하는 댓글 조회

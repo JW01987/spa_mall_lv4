@@ -10,7 +10,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  writer: {
+  nickname: {
     type: String,
     required: true,
   },
@@ -19,10 +19,6 @@ const postSchema = new mongoose.Schema({
     default: new Date(new Date().getTime() + 1000 * 60 * 60 * 9),
   },
   content: {
-    type: String,
-    required: true,
-  },
-  password: {
     type: String,
     required: true,
   },
