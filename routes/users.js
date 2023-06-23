@@ -1,9 +1,6 @@
-// routes/users.js
-
 const express = require("express");
 const router = express.Router();
-
-const User = require("../schemas/user");
+const { Users } = require("../models");
 
 // 회원가입 API
 router.post("/users", async (req, res) => {
@@ -16,7 +13,7 @@ router.post("/users", async (req, res) => {
     });
     return;
   }
-  if (password.length <= 4 && password.includes(nickname)) {
+  if (password.length <= 4 || password.includes(nickname)) {
     res.status(400).json({
       errorMessage: "비밀번호는 4자 이상, 닉네임을 포함할 수 없습니다.",
     });
@@ -30,19 +27,15 @@ router.post("/users", async (req, res) => {
   }
 
   // email 또는 nickname이 동일한 데이터가 있는지 확인하기 위해 가져온다.
-  const existsUsers = await User.findOne({
-    $or: [{ nickname }],
-  });
+  const existsUsers = await Users.findOne({ where: { nickname } });
   if (existsUsers) {
-    // NOTE: 보안을 위해 인증 메세지는 자세히 설명하지 않습니다.
     res.status(400).json({
       errorMessage: "중복된 닉네임입니다.",
     });
     return;
   }
 
-  const user = new User({ nickname, password });
-  await user.save();
+  await Users.create({ nickname, password });
 
   res.status(201).json({});
 });

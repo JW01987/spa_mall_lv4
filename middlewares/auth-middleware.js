@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../schemas/user");
+const { Users } = require("../models");
 
 // 사용자 인증 미들웨어
 module.exports = async (req, res, next) => {
@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
 
   try {
     const { userId } = jwt.verify(authToken, "customized-secret-key");
-    const user = await User.findById(userId);
+    const user = await Users.findOne({ where: { nickname: userId } });
     res.locals.user = user;
     next();
   } catch (err) {
