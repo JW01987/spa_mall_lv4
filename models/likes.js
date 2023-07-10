@@ -1,29 +1,24 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Users extends Model {
+  class Likes extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      this.hasMany(models.Posts, {
-        sourceKey: "id", //users 안의 필드
+      this.belongsTo(models.Users, {
+        targetKey: "id",
         foreignKey: "userId",
       });
-      this.hasMany(models.Comments, {
-        sourceKey: "id",
-        foreignKey: "userId",
-      });
-      this.hasMany(models.Likes, {
-        sourceKey: "id",
-        foreignKey: "userId",
+      this.belongsTo(models.Posts, {
+        targetKey: "id",
+        foreignKey: "postId",
       });
     }
   }
-  Users.init(
+  Likes.init(
     {
       id: {
         allowNull: false,
@@ -31,29 +26,35 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      nickname: {
-        type: DataTypes.STRING,
+      userId: {
         allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Users",
+          key: "id",
+        },
       },
-      password: {
-        type: DataTypes.STRING,
+      postId: {
         allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Posts",
+          key: "id",
+        },
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        type: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        type: DataTypes.NOW,
       },
     },
     {
       sequelize,
-      modelName: "Users",
+      modelName: "Likes",
     }
   );
-  return Users;
+  return Likes;
 };

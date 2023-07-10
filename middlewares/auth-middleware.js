@@ -15,13 +15,15 @@ module.exports = async (req, res, next) => {
 
   try {
     const { userId } = jwt.verify(authToken, "customized-secret-key");
-    const user = await Users.findOne({ where: { nickname: userId } });
+    const user = await Users.findOne({ where: { id: userId } });
+    if (user.length === 0) {
+      res.status(401).send({
+        errorMessage: "로그인 후 이용 가능한 기능입니다.",
+      });
+    }
     res.locals.user = user;
     next();
   } catch (err) {
-    console.error(err);
-    res.status(401).send({
-      errorMessage: "로그인 후 이용 가능한 기능입니다.",
-    });
+    res.status(401).send({ success: false, errorMessage: err.message });
   }
 };

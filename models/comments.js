@@ -9,26 +9,26 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Users, {
-        targetKey: "nickname",
-        foreignKey: "nickname",
+        targetKey: "id",
+        foreignKey: "userId",
       });
       this.belongsTo(models.Posts, {
-        targetKey: "postId",
+        targetKey: "id",
         foreignKey: "postId",
       });
     }
   }
   Comments.init(
     {
-      commentId: {
+      id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      nickname: {
+      userId: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
       },
       postId: {
         allowNull: false,
@@ -38,17 +38,13 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
-      date: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE,
+        type: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE,
+        type: DataTypes.NOW,
       },
     },
     {
