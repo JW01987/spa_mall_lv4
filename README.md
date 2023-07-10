@@ -1,4 +1,3 @@
-# config/config.json에 RDS 입력해주세요
 
 # Api 명세
 
