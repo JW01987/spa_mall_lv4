@@ -5,7 +5,6 @@ class PostsController {
   //전체 게시글 조회
   getAllPosts = async (req, res, next) => {
     const posts = await this.postService.findAllPost();
-
     res.status(200).json({ success: true, posts });
   };
   //게시글 상세 조회
