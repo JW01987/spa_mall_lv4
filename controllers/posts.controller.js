@@ -41,13 +41,17 @@ class PostsController {
   likePosts = async (req, res, next) => {
     const { id } = res.locals.user;
     const posts = await this.postService.likePosts(id);
-
-    res.status(201).json({ success: true, posts });
+    if (posts.success === false) {
+      res.status(201).json({ posts });
+    } else {
+      res.status(201).json({ success: true, posts });
+    }
   };
   checkLike = async (req, res, next) => {
     const { postId } = req.params;
     const { id } = res.locals.user;
     const checkLike = await this.postService.checkLike(postId, id);
+    res.status(200).json({ checkLike });
   };
 }
 

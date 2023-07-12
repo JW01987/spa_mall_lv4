@@ -57,6 +57,8 @@ class PostService {
   };
   likePosts = async (id) => {
     const findPost = await this.postRepository.findLikePost(id);
+    if (findPost.length === 0)
+      return { success: false, msg: "좋아요 게시글이 없습니다" };
     return {
       postId: findPost.Post.id,
       nickname: findPost.User.nickname,
@@ -73,8 +75,10 @@ class PostService {
     const checkLike = await this.postRepository.checkLike(postId, id);
     if (checkLike) {
       await this.postRepository.deleteLike(postId, id);
+      return { msg: "좋아요가 취소되었습니다" };
     } else {
       await this.postRepository.addLike(postId, id);
+      return { msg: "좋아요가 등록되었습니다" };
     }
   };
 }

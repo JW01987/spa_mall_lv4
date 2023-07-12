@@ -3,18 +3,13 @@ const app = express();
 const port = 3000;
 const connect = require("./schemas");
 const cookieParser = require("cookie-parser");
-const {
-  commentRouter,
-  postRouter,
-  usersRouter,
-  authRouter,
-} = require("./routes");
+const { commentRouter, postRouter, usersRouter } = require("./routes");
 connect();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use("/api", [postRouter, commentRouter, usersRouter, authRouter]);
+app.use("/api", [usersRouter, postRouter, commentRouter]);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

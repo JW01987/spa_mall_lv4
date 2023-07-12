@@ -1,5 +1,5 @@
 const { Posts, Users, Likes } = require("../models");
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 class PostRepository {
   findAllPost = async () => {
     const posts = await Posts.findAll({

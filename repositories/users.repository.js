@@ -1,14 +1,14 @@
-const { Posts, Users, Likes } = require("../models");
-const { Sequelize } = require("sequelize");
+const { Users } = require("../models");
+const { Op } = require("sequelize");
 class UserRepository {
   checkUser = async (nickname) => {
     const checkUser = await Users.findOne({ where: { nickname } });
-    return { checkUser };
+    return checkUser;
   };
-  singUp = async (nickname, password) => {
+  signUp = async (nickname, password) => {
     await Users.create({ nickname, password });
   };
-  singIn = async (nickname, password) => {
+  signIn = async (nickname, password) => {
     const user = await Users.findOne({
       where: { [Op.and]: [{ nickname }, { password }] },
     });
