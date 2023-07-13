@@ -58,13 +58,16 @@ class PostService {
   likePosts = async (id) => {
     const findPost = await this.postRepository.findLikePost(id);
     if (findPost.length === 0)
-      return { success: false, msg: "좋아요 게시글이 없습니다" };
+      return { status: 404, msg: "좋아요 게시글이 없습니다" };
     return {
-      postId: findPost.Post.id,
-      nickname: findPost.User.nickname,
-      title: findPost.Post.title,
-      content: findPost.Post.content,
-      like: findPost.dataValues.likesCount,
+      status: 200,
+      msg: {
+        postId: findPost.Post.id,
+        nickname: findPost.User.nickname,
+        title: findPost.Post.title,
+        content: findPost.Post.content,
+        like: findPost.dataValues.likesCount,
+      },
     };
   };
   checkLike = async (postId, id) => {
